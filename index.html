@@ -1,28 +1,100 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Baby Bloom Verification Dashboard</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Baby Bloom Verification</title>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 1200px; margin: auto; padding: 20px; background: #f9f9f9; }
-        h1 { text-align: center; color: #2c3e50; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-        .item { border: 1px solid #ddd; padding: 15px; border-radius: 8px; background: #fff; }
-        .item label { font-weight: bold; display: block; margin-bottom: 5px; color: #2c3e50; }
-        img { max-width: 100%; height: auto; border: 1px solid #ccc; border-radius: 4px; }
-        button { background: #4CAF50; color: #fff; padding: 12px 24px; border: none; border-radius: 5px; cursor: pointer; font-size: 1rem; margin-top: 20px; }
-        button:hover { background: #45a049; }
-        .footer { margin-top: 30px; text-align: center; font-size: 0.9rem; color: #777; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f8f9fa; padding: 6px; font-size: 12px; line-height: 1.3; }
+        .header { text-align: center; margin-bottom: 6px; }
+        h1 { font-size: 13px; color: #1a3c6e; }
+        .submitted { font-size: 9px; color: #6c757d; opacity: 0.7; margin-top: 1px; }
+        .container { display: flex; flex-direction: column; height: 100vh; max-height: 100vh; overflow: hidden; }
+        .images { display: flex; gap: 5px; margin-bottom: 6px; }
+        .images img { width: 48%; height: auto; max-height: 120px; object-fit: contain; border: 1.3px solid #1a3c6e; border-radius: 4px; }
+        .comparison { display: flex; gap: 6px; flex: 1 0 auto; margin-bottom: 6px; }
+        .col { flex: 1; background: #fff; padding: 6px; border-radius: 5px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); display: flex; flex-direction: column; justify-content: flex-start; }
+        .col h2 { font-size: 11px; color: #1a3c6e; margin-bottom: 3px; font-weight: 600; }
+        .row { display: flex; justify-content: space-between; margin-bottom: 2px; font-size: 11px; }
+        .row label { font-weight: 600; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .row span { flex: 2; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .contact { background: #fff; padding: 6px; border-radius: 5px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); margin-bottom: 6px; flex: 0 0 auto; }
+        .contact h2 { font-size: 11px; color: #1a3c6e; margin-bottom: 3px; }
+        .issues { background: #fff; padding: 6px; border-radius: 5px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); margin-bottom: 6px; flex: 0 0 auto; }
+        .issues h2 { font-size: 11px; color: #1a3c6e; margin-bottom: 2px; }
+        .issues ul { list-style: disc; padding-left: 12px; margin: 0; font-size: 10.5px; color: #dc3545; }
+        .issues li { margin-bottom: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .comments { background: #fff; padding: 6px; border-radius: 5px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); margin-bottom: 6px; flex: 0 0 auto; }
+        .comments h2 { font-size: 11px; color: #1a3c6e; margin-bottom: 2px; }
+        .comments textarea { width: 100%; height: 40px; font-size: 10.5px; padding: 4px; border: 1px solid #ced4da; border-radius: 4px; resize: none; }
+        .buttons { display: flex; gap: 6px; flex: 0 0 auto; }
+        .verify-btn { background: #28a745; color: #fff; flex: 1; }
+        .fail-btn { background: #dc3545; color: #fff; flex: 1; }
+        .verify-btn, .fail-btn { padding: 9px; border: none; border-radius: 5px; font-size: 12px; font-weight: 600; cursor: pointer; }
+        .verify-btn:hover { background: #218838; }
+        .fail-btn:hover { background: #c82333; }
+        @media (max-width: 600px) {
+            .comparison { flex-direction: column; }
+            .images img { max-height: 100px; }
+            .row { font-size: 10.5px; }
+            .col h2, .contact h2, .issues h2, .comments h2 { font-size: 10.5px; }
+            .buttons { flex-direction: column; }
+        }
     </style>
 </head>
 <body>
-    <h1>Verification for Contact ID: <span id="contactId"></span></h1>
-    <div class="grid" id="data-grid"></div>
-    <div style="text-align: center;">
-        <button id="verify-btn">Verify User</button>
+    <div class="container">
+        <div class="header">
+            <h1>Verification</h1>
+            <div class="submitted" id="submitted"></div>
+        </div>
+        <div class="images">
+            <img id="passportImg" alt="Passport">
+            <img id="idImg" alt="ID">
+        </div>
+        <div class="comparison">
+            <div class="col">
+                <h2>Personal Details</h2>
+                <div class="row"><label>Contact ID</label><span id="contactId"></span></div>
+                <div class="row"><label>Surname</label><span id="surname"></span></div>
+                <div class="row"><label>Given Name(s)</label><span id="givenNames"></span></div>
+                <div class="row"><label>Date of Birth</label><span id="dob"></span></div>
+                <div class="row"><label>Nationality</label><span id="nationality"></span></div>
+            </div>
+            <div class="col">
+                <h2>Passport Details</h2>
+                <div class="row"><label>Surname</label><span id="passportSurname"></span></div>
+                <div class="row"><label>Given Name(s)</label><span id="passportGivenNames"></span></div>
+                <div class="row"><label>Date of Birth</label><span id="passportDob"></span></div>
+                <div class="row"><label>Nationality</label><span id="passportNationality"></span></div>
+                <div class="row"><label>Number</label><span id="passportNumber"></span></div>
+                <div class="row"><label>Expiry</label><span id="passportExpiry"></span></div>
+            </div>
+        </div>
+        <div class="contact">
+            <h2>Contact Details</h2>
+            <div class="row"><label>Email</label><span id="email"></span></div>
+            <div class="row"><label>Phone</label><span id="phone"></span></div>
+            <div class="row"><label>Address</label><span id="addressLine1"></span></div>
+            <div class="row"><label>City / Zip</label><span id="cityZip"></span></div>
+            <div class="row"><label>Country</label><span id="addressCountry"></span></div>
+        </div>
+        <div class="issues">
+            <h2>AI Flagged Issues</h2>
+            <ul id="issuesList"></ul>
+        </div>
+        <div class="comments">
+            <h2>Comments (if failed)</h2>
+            <textarea id="comments" placeholder="Enter reason for failure..."></textarea>
+        </div>
+        <div class="buttons">
+            <button class="verify-btn" id="verify-btn">VERIFY USER</button>
+            <button class="fail-btn" id="fail-btn">VERIFICATION FAILED</button>
+        </div>
     </div>
 
     <script>
-        // Parse URL params
         const params = new URLSearchParams(location.search);
         const encoded = params.get('data');
         const contactId = params.get('id');
@@ -30,66 +102,84 @@
         let data = {};
         if (encoded) {
             try { data = JSON.parse(atob(encoded)); }
-            catch (e) { alert('Invalid data'); }
-        } else {
-            alert('No data provided.');
+            catch(e) { alert('Invalid data'); }
         }
 
-        document.getElementById('contactId').textContent = data.contactId || 'N/A';
+        document.getElementById('contactId').textContent = data.contactId || '—';
+        document.getElementById('submitted').textContent = data.verificationSubmitTimestamp || '—';
+        document.getElementById('passportImg').src = data.passportUrl || '';
+        document.getElementById('idImg').src = data.idPhotoUrl || '';
+        document.getElementById('surname').textContent = data.lastName || '—';
+        document.getElementById('givenNames').textContent = data.firstName || '—';
+        document.getElementById('dob').textContent = data.dob || '—';
+        document.getElementById('nationality').textContent = data.nationality || '—';
+        document.getElementById('passportSurname').textContent = data.extracted.surname || '—';
+        document.getElementById('passportGivenNames').textContent = data.extracted.givenNames || '—';
+        document.getElementById('passportDob').textContent = data.extracted.dob || '—';
+        document.getElementById('passportNationality').textContent = data.extracted.nationality || '—';
+        document.getElementById('passportNumber').textContent = data.passportNumber || '—';
+        document.getElementById('passportExpiry').textContent = data.passportExpiry || '—';
+        document.getElementById('email').textContent = data.email || '—';
+        document.getElementById('phone').textContent = data.phoneNumber || '—';
+        document.getElementById('addressLine1').textContent = data.addressLine1 || '—';
+        document.getElementById('cityZip').textContent = (data.addressCity || '') + ' ' + (data.addressZip || '');
+        document.getElementById('addressCountry').textContent = data.addressCountry || '—';
 
-        // Updated fields (added email)
-        const fields = [
-            { label: 'First Name', value: data.firstName, type: 'text' },
-            { label: 'Last Name', value: data.lastName, type: 'text' },
-            { label: 'Email', value: data.email, type: 'text' },  // New: From NannySignUps
-            { label: 'Nationality', value: data.nationality, type: 'text' },
-            { label: 'Phone Number', value: data.phoneNumber, type: 'text' },
-            { label: 'Address Country', value: data.addressCountry, type: 'text' },
-            { label: 'Address Line 1', value: data.addressLine1, type: 'text' },
-            { label: 'Address City', value: data.addressCity, type: 'text' },
-            { label: 'Address Zip', value: data.addressZip, type: 'text' },
-            { label: 'Passport Number', value: data.passportNumber, type: 'text' },
-            { label: 'Passport Expiry', value: data.passportExpiry, type: 'text' },
-            { label: 'Verification Submit Timestamp', value: data.verificationSubmitTimestamp, type: 'text' },
-            { label: 'Passport Photo', value: data.passportUrl, type: 'image' },
-            { label: 'ID Photo', value: data.idPhotoUrl, type: 'image' }
-        ];
+        const issuesList = document.getElementById('issuesList');
+        if (data.issues && data.issues.length > 0) {
+            data.issues.forEach(issue => {
+                const li = document.createElement('li');
+                li.textContent = issue;
+                issuesList.appendChild(li);
+            });
+        } else {
+            const li = document.createElement('li');
+            li.textContent = 'None';
+            issuesList.appendChild(li);
+        }
 
-        const grid = document.getElementById('data-grid');
-        fields.forEach(field => {
-            const div = document.createElement('div');
-            div.className = 'item';
-            div.innerHTML = `<label>${field.label}</label>`;
-            if (field.type === 'image' && field.value) {
-                const img = document.createElement('img');
-                img.src = field.value;
-                div.appendChild(img);
+        // Verify Button
+        document.getElementById('verify-btn').addEventListener('click', async () => {
+            if (!confirm('Mark as VERIFIED?')) return;
+            const res = await fetch('https://hook.make.com/YOUR_VERIFY_WEBHOOK', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({contactId: contactId, status: 'verified'})
+            });
+            if (res.ok) {
+                alert('Verified!');
+                document.getElementById('verify-btn').disabled = true;
+                document.getElementById('verify-btn').textContent = 'VERIFIED';
             } else {
-                div.innerHTML += `<span>${field.value || 'N/A'}</span>`;
+                alert('Error');
             }
-            grid.appendChild(div);
         });
 
-        // Verify button - POST to Make.com webhook
-        document.getElementById('verify-btn').addEventListener('click', async () => {
-            if (confirm('Confirm verification?')) {
-                const response = await fetch('https://hook.make.com/your-webhook-id', {  // Replace with your webhook
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contactId: contactId, status: 'verified' })
-                });
-                if (response.ok) {
-                    alert('User verified successfully!');
-                    document.getElementById('verify-btn').disabled = true;
-                } else {
-                    alert('Error verifying user.');
-                }
+        // Fail Button
+        document.getElementById('fail-btn').addEventListener('click', async () => {
+            const comments = document.getElementById('comments').value.trim();
+            if (!comments) {
+                alert('Please enter comments for failure.');
+                return;
+            }
+            if (!confirm('Mark as FAILED and notify user?')) return;
+            const res = await fetch('https://hook.make.com/YOUR_FAIL_WEBHOOK', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    contactId: contactId,
+                    verificationStatus: 'FAILED',
+                    comments: comments
+                })
+            });
+            if (res.ok) {
+                alert('Failure recorded and user notified.');
+                document.getElementById('fail-btn').disabled = true;
+                document.getElementById('fail-btn').textContent = 'FAILED SENT';
+            } else {
+                alert('Error');
             }
         });
     </script>
-
-    <div class="footer">
-        <p>Baby Bloom Verification Dashboard</p>
-    </div>
 </body>
 </html>
