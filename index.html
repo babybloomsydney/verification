@@ -159,13 +159,21 @@
         });
         modal.onclick = () => modal.classList.remove('active');
 
+        const webhook = 'https://hook.eu2.make.com/451we04092bdhoa61zbof96ddgcwkwcy';
+
         // Verify Button
         document.getElementById('verify-btn').addEventListener('click', async () => {
             if (!confirm('Mark as VERIFIED?')) return;
-            const res = await fetch('https://hook.make.com/YOUR_VERIFY_WEBHOOK', {
+            const payload = {
+                contactId: contactId,
+                verificationStatus: 'verified',
+                comments: 'success',
+                timestamp: new Date().toISOString()
+            };
+            const res = await fetch(webhook, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({contactId: contactId, status: 'verified'})
+                body: JSON.stringify(payload)
             });
             if (res.ok) {
                 alert('Verified!');
@@ -184,14 +192,16 @@
                 return;
             }
             if (!confirm('Mark as FAILED and notify user?')) return;
-            const res = await fetch('https://hook.make.com/YOUR_FAIL_WEBHOOK', {
+            const payload = {
+                contactId: contactId,
+                verificationStatus: 'FAILED',
+                comments: comments,
+                timestamp: new Date().toISOString()
+            };
+            const res = await fetch(webhook, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    contactId: contactId,
-                    verificationStatus: 'FAILED',
-                    comments: comments
-                })
+                body: JSON.stringify(payload)
             });
             if (res.ok) {
                 alert('Failure recorded and user notified.');
