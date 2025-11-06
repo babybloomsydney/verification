@@ -10,36 +10,38 @@
         .header { text-align: center; margin-bottom: 6px; }
         h1 { font-size: 13px; color: #1a3c6e; }
         .submitted { font-size: 9px; color: #6c757d; opacity: 0.7; margin-top: 1px; }
-        .container { display: flex; flex-direction: column; height: 100vh; max-height: 100vh; overflow: hidden; }
-        .images { display: flex; gap: 5px; margin-bottom: 6px; }
-        .images img { width: 48%; height: auto; max-height: 120px; object-fit: contain; border: 1.3px solid #1a3c6e; border-radius: 4px; }
-        .comparison { display: flex; gap: 6px; flex: 1 0 auto; margin-bottom: 6px; }
-        .col { flex: 1; background: #fff; padding: 6px; border-radius: 5px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); display: flex; flex-direction: column; justify-content: flex-start; }
-        .col h2 { font-size: 11px; color: #1a3c6e; margin-bottom: 3px; font-weight: 600; }
-        .row { display: flex; justify-content: space-between; margin-bottom: 2px; font-size: 11px; }
+        .container { display: flex; flex-direction: column; height: 100vh; max-height: 100vh; overflow: hidden; position: relative; padding-bottom: 50px; }
+        .images { display: flex; gap: 6px; margin-bottom: 6px; }
+        .images img { width: 48%; height: auto; max-height: 160px; object-fit: contain; border: 1.5px solid #1a3c6e; border-radius: 5px; cursor: zoom-in; }
+        .comparison { display: flex; gap: 6px; flex: 1 0 auto; margin-bottom: 6px; overflow: hidden; }
+        .col { flex: 1; background: #fff; padding: 4px; border-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
+        .col h2 { font-size: 11px; color: #1a3c6e; margin-bottom: 2px; font-weight: 600; }
+        .row { display: flex; justify-content: space-between; margin-bottom: 1px; font-size: 11px; }
         .row label { font-weight: 600; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .row span { flex: 2; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .contact { background: #fff; padding: 6px; border-radius: 5px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); margin-bottom: 6px; flex: 0 0 auto; }
-        .contact h2 { font-size: 11px; color: #1a3c6e; margin-bottom: 3px; }
-        .issues { background: #fff; padding: 6px; border-radius: 5px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); margin-bottom: 6px; flex: 0 0 auto; }
-        .issues h2 { font-size: 11px; color: #1a3c6e; margin-bottom: 2px; }
+        .contact, .issues, .comments { background: #fff; padding: 4px; border-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); margin-bottom: 6px; }
+        .contact h2, .issues h2, .comments h2 { font-size: 11px; color: #1a3c6e; margin-bottom: 2px; }
         .issues ul { list-style: disc; padding-left: 12px; margin: 0; font-size: 10.5px; color: #dc3545; }
         .issues li { margin-bottom: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .comments { background: #fff; padding: 6px; border-radius: 5px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); margin-bottom: 6px; flex: 0 0 auto; }
-        .comments h2 { font-size: 11px; color: #1a3c6e; margin-bottom: 2px; }
-        .comments textarea { width: 100%; height: 40px; font-size: 10.5px; padding: 4px; border: 1px solid #ced4da; border-radius: 4px; resize: none; }
-        .buttons { display: flex; gap: 6px; flex: 0 0 auto; }
+        .comments textarea { width: 100%; height: 36px; font-size: 10.5px; padding: 3px; border: 1px solid #ced4da; border-radius: 4px; resize: none; }
+        .buttons { position: fixed; bottom: 0; left: 0; right: 0; display: flex; gap: 6px; padding: 6px; background: #f8f9fa; border-top: 1px solid #dee2e6; z-index: 100; }
         .verify-btn { background: #28a745; color: #fff; flex: 1; }
         .fail-btn { background: #dc3545; color: #fff; flex: 1; }
         .verify-btn, .fail-btn { padding: 9px; border: none; border-radius: 5px; font-size: 12px; font-weight: 600; cursor: pointer; }
         .verify-btn:hover { background: #218838; }
         .fail-btn:hover { background: #c82333; }
+
+        /* Modal */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 200; justify-content: center; align-items: center; padding: 20px; }
+        .modal img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 6px; }
+        .modal.active { display: flex; }
+
         @media (max-width: 600px) {
             .comparison { flex-direction: column; }
-            .images img { max-height: 100px; }
+            .images img { max-height: 130px; }
             .row { font-size: 10.5px; }
             .col h2, .contact h2, .issues h2, .comments h2 { font-size: 10.5px; }
-            .buttons { flex-direction: column; }
+            .buttons { flex-direction: row; }
         }
     </style>
 </head>
@@ -88,10 +90,16 @@
             <h2>Comments (if failed)</h2>
             <textarea id="comments" placeholder="Enter reason for failure..."></textarea>
         </div>
-        <div class="buttons">
-            <button class="verify-btn" id="verify-btn">VERIFY USER</button>
-            <button class="fail-btn" id="fail-btn">VERIFICATION FAILED</button>
-        </div>
+    </div>
+
+    <div class="buttons">
+        <button class="verify-btn" id="verify-btn">VERIFY USER</button>
+        <button class="fail-btn" id="fail-btn">VERIFICATION FAILED</button>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="modal">
+        <img id="modalImg" alt="Enlarged">
     </div>
 
     <script>
@@ -107,8 +115,10 @@
 
         document.getElementById('contactId').textContent = data.contactId || '—';
         document.getElementById('submitted').textContent = data.verificationSubmitTimestamp || '—';
-        document.getElementById('passportImg').src = data.passportUrl || '';
-        document.getElementById('idImg').src = data.idPhotoUrl || '';
+        const passportImg = document.getElementById('passportImg');
+        const idImg = document.getElementById('idImg');
+        passportImg.src = data.passportUrl || '';
+        idImg.src = data.idPhotoUrl || '';
         document.getElementById('surname').textContent = data.lastName || '—';
         document.getElementById('givenNames').textContent = data.firstName || '—';
         document.getElementById('dob').textContent = data.dob || '—';
@@ -137,6 +147,17 @@
             li.textContent = 'None';
             issuesList.appendChild(li);
         }
+
+        // Modal Logic
+        const modal = document.getElementById('modal');
+        const modalImg = document.getElementById('modalImg');
+        [passportImg, idImg].forEach(img => {
+            img.onclick = () => {
+                modalImg.src = img.src;
+                modal.classList.add('active');
+            };
+        });
+        modal.onclick = () => modal.classList.remove('active');
 
         // Verify Button
         document.getElementById('verify-btn').addEventListener('click', async () => {
