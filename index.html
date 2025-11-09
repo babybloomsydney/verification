@@ -10,6 +10,8 @@
         .header { text-align: center; margin-bottom: 6px; }
         h1 { font-size: 13px; color: #1a3c6e; }
         .contact-id { font-size: 10px; color: #6c757d; margin-top: 2px; font-weight: 600; }
+        .nanny-link { font-size: 9px; margin-top: 1px; }
+        .nanny-link a { color: #007bff; text-decoration: underline; }
         .submitted { font-size: 9px; color: #6c757d; opacity: 0.7; margin-top: 1px; }
         .container { display: flex; flex-direction: column; height: 100vh; max-height: 100vh; overflow: hidden; position: relative; padding-bottom: 50px; }
         .images { display: flex; gap: 6px; margin-bottom: 6px; }
@@ -48,6 +50,7 @@
         <div class="header">
             <h1>Verification</h1>
             <div class="contact-id">Contact ID: <span id="contactId"></span></div>
+            <div class="nanny-link"><a id="nannyProfileLink" href="#" target="_blank">View Nanny Profile</a></div>
             <div class="submitted" id="submitted"></div>
         </div>
         <div class="images">
@@ -115,7 +118,9 @@
         }
 
         // --- 2. POPULATE FIELDS (flat JSON) ---
-        document.getElementById('contactId').textContent = data.contactId || '—';
+        const contactId = data.contactId || '—';
+        document.getElementById('contactId').textContent = contactId;
+        document.getElementById('nannyProfileLink').href = `https://babybloomsydney.com.au/nanny/${contactId}`;
         document.getElementById('submitted').textContent = data.verificationSubmitTimestamp || '—';
         document.getElementById('passportImg').src = data.passportUrl || '';
         document.getElementById('idImg').src = data.idPhotoUrl || '';
@@ -166,7 +171,7 @@
         const webhook = 'https://hook.eu2.make.com/451we04092bdhoa61zbof96ddgcwkwcy';
         document.getElementById('verify-btn').addEventListener('click', async () => {
             if (!confirm('Mark as VERIFIED?')) return;
-            const payload = { contactId: data.contactId, verificationStatus: 'verified', comments: 'success', timestamp: new Date().toISOString() };
+            const payload = { contactId, verificationStatus: 'verified', comments: 'success', timestamp: new Date().toISOString() };
             const res = await fetch(webhook, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
             if (res.ok) {
                 alert('Verified!');
@@ -178,7 +183,7 @@
             const comments = document.getElementById('comments').value.trim();
             if (!comments) { alert('Please enter comments'); return; }
             if (!confirm('Mark as FAILED?')) return;
-            const payload = { contactId: data.contactId, verificationStatus: 'FAILED', comments, timestamp: new Date().toISOString() };
+            const payload = { contactId, verificationStatus: 'FAILED', comments, timestamp: new Date().toISOString() };
             const res = await fetch(webhook, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
             if (res.ok) {
                 alert('Failure recorded');
