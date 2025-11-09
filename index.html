@@ -9,6 +9,7 @@
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f8f9fa; padding: 6px; font-size: 12px; line-height: 1.3; }
         .header { text-align: center; margin-bottom: 6px; }
         h1 { font-size: 13px; color: #1a3c6e; }
+        .contact-id { font-size: 10px; color: #6c757d; margin-top: 2px; font-weight: 600; }
         .submitted { font-size: 9px; color: #6c757d; opacity: 0.7; margin-top: 1px; }
         .container { display: flex; flex-direction: column; height: 100vh; max-height: 100vh; overflow: hidden; position: relative; padding-bottom: 50px; }
         .images { display: flex; gap: 6px; margin-bottom: 6px; }
@@ -46,6 +47,7 @@
     <div class="container">
         <div class="header">
             <h1>Verification</h1>
+            <div class="contact-id">Contact ID: <span id="contactId"></span></div>
             <div class="submitted" id="submitted"></div>
         </div>
         <div class="images">
@@ -55,7 +57,7 @@
         <div class="comparison">
             <div class="col">
                 <h2>Personal Details</h2>
-                <div class="row"><label>Contact ID</label><span id="contactId"></span></div>
+                <!-- Contact ID REMOVED FROM HERE -->
                 <div class="row"><label>Surname</label><span id="surname"></span></div>
                 <div class="row"><label>Given Name(s)</label><span id="givenNames"></span></div>
                 <div class="row"><label>Date of Birth</label><span id="dob"></span></div>
