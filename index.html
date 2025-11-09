@@ -43,141 +43,139 @@
     </style>
 </head>
 <body>
-<div class="container">
-    <div class="header">
-        <h1>Verification</h1>
-        <div class="submitted" id="submitted"></div>
-    </div>
-    <div class="images">
-        <img id="passportImg" alt="Passport">
-        <img id="idImg" alt="ID">
-    </div>
-    <div class="comparison">
-        <div class="col">
-            <h2>Personal Details</h2>
-            <div class="row"><label>Contact ID</label><span id="contactId"></span></div>
-            <div class="row"><label>Surname</label><span id="surname"></span></div>
-            <div class="row"><label>Given Name(s)</label><span id="givenNames"></span></div>
-            <div class="row"><label>Date of Birth</label><span id="dob"></span></div>
-            <div class="row"><label>Nationality</label><span id="nationality"></span></div>
+    <div class="container">
+        <div class="header">
+            <h1>Verification</h1>
+            <div class="submitted" id="submitted"></div>
         </div>
-        <div class="col">
-            <h2>Passport Details</h2>
-            <div class="row"><label>Surname</label><span id="passportSurname"></span></div>
-            <div class="row"><label>Given Name(s)</label><span id="passportGivenNames"></span></div>
-            <div class="row"><label>Date of Birth</label><span id="passportDob"></span></div>
-            <div class="row"><label>Nationality</label><span id="passportNationality"></span></div>
-            <div class="row"><label>Number</label><span id="passportNumber"></span></div>
-            <div class="row"><label>Expiry</label><span id="passportExpiry"></span></div>
+        <div class="images">
+            <img id="passportImg" alt="Passport">
+            <img id="idImg" alt="ID">
+        </div>
+        <div class="comparison">
+            <div class="col">
+                <h2>Personal Details</h2>
+                <div class="row"><label>Contact ID</label><span id="contactId"></span></div>
+                <div class="row"><label>Surname</label><span id="surname"></span></div>
+                <div class="row"><label>Given Name(s)</label><span id="givenNames"></span></div>
+                <div class="row"><label>Date of Birth</label><span id="dob"></span></div>
+                <div class="row"><label>Nationality</label><span id="nationality"></span></div>
+            </div>
+            <div class="col">
+                <h2>Passport Details</h2>
+                <div class="row"><label>Surname</label><span id="passportSurname"></span></div>
+                <div class="row"><label>Given Name(s)</label><span id="passportGivenNames"></span></div>
+                <div class="row"><label>Date of Birth</label><span id="passportDob"></span></div>
+                <div class="row"><label>Nationality</label><span id="passportNationality"></span></div>
+                <div class="row"><label>Number</label><span id="passportNumber"></span></div>
+                <div class="row"><label>Expiry</label><span id="passportExpiry"></span></div>
+            </div>
+        </div>
+        <div class="contact">
+            <h2>Contact Details</h2>
+            <div class="row"><label>Email</label><span id="email"></span></div>
+            <div class="row"><label>Phone</label><span id="phone"></span></div>
+            <div class="row"><label>Address</label><span id="addressLine1"></span></div>
+            <div class="row"><label>City / Zip</label><span id="cityZip"></span></div>
+            <div class="row"><label>Country</label><span id="addressCountry"></span></div>
+        </div>
+        <div class="issues">
+            <h2>AI Flagged Issues</h2>
+            <ul id="issuesList"></ul>
+        </div>
+        <div class="comments">
+            <h2>Comments (if failed)</h2>
+            <textarea id="comments" placeholder="Enter reason for failure..."></textarea>
         </div>
     </div>
-    <div class="contact">
-        <h2>Contact Details</h2>
-        <div class="row"><label>Email</label><span id="email"></span></div>
-        <div class="row"><label>Phone</label><span id="phone"></span></div>
-        <div class="row"><label>Address</label><span id="addressLine1"></span></div>
-        <div class="row"><label>City / Zip</label><span id="cityZip"></span></div>
-        <div class="row"><label>Country</label><span id="addressCountry"></span></div>
+
+    <div class="buttons">
+        <button class="verify-btn" id="verify-btn">VERIFY USER</button>
+        <button class="fail-btn" id="fail-btn">VERIFICATION FAILED</button>
     </div>
-    <div class="issues">
-        <h2>AI Flagged Issues</h2>
-        <ul id="issuesList"></ul>
+
+    <div class="modal" id="modal">
+        <img id="modalImg" alt="Enlarged">
     </div>
-    <div class="comments">
-        <h2>Comments (if failed)</h2>
-        <textarea id="comments" placeholder="Enter reason for failure..."></textarea>
-    </div>
-</div>
 
-<div class="buttons">
-    <button class="verify-btn" id="verify-btn">VERIFY USER</button>
-    <button class="fail-btn" id="fail-btn">VERIFICATION FAILED</button>
-</div>
+    <script>
+        const params = new URLSearchParams(location.search);
+        const encoded = params.get('data');
+        let data = {};
+        if (encoded) {
+            try { data = JSON.parse(atob(encoded)); }
+            catch(e) { alert('Invalid data'); }
+        }
 
-<div class="modal" id="modal">
-    <img id="modalImg" alt="Enlarged">
-</div>
+        const contactId = data.contactId || '—';
+        document.getElementById('contactId').textContent = contactId;
+        document.getElementById('submitted').textContent = data.verificationSubmitTimestamp || '—';
+        document.getElementById('passportImg').src = data.passportUrl || '';
+        document.getElementById('idImg').src = data.idPhotoUrl || '';
+        document.getElementById('surname').textContent = data.lastName || '—';
+        document.getElementById('givenNames').textContent = data.firstName || '—';
+        document.getElementById('dob').textContent = data.dob || '—';
+        document.getElementById('nationality').textContent = data.nationality || '—';
+        document.getElementById('passportSurname').textContent = data.extracted?.surname || '—';
+        document.getElementById('passportGivenNames').textContent = data.extracted?.givenNames || '—';
+        document.getElementById('passportDob').textContent = data.extracted?.dob || '—';
+        document.getElementById('passportNationality').textContent = data.extracted?.nationality || '—';
+        document.getElementById('passportNumber').textContent = data.passportNumber || '—';
+        document.getElementById('passportExpiry').textContent = data.passportExpiry || '—';
+        document.getElementById('email').textContent = data.email || '—';
+        document.getElementById('phone').textContent = data.phoneNumber || '—';
+        document.getElementById('addressLine1').textContent = data.addressLine1 || '—';
+        document.getElementById('cityZip').textContent = (data.addressCity || '') + ' ' + (data.addressZip || '');
+        document.getElementById('addressCountry').textContent = data.addressCountry || '—';
 
-<script>
-const params = new URLSearchParams(location.search);
-const encoded = params.get('data');
-let data = {};
-if (encoded) {
-    try { data = JSON.parse(atob(encoded)); }
-    catch(e) { alert('Invalid data'); }
-}
+        const issuesList = document.getElementById('issuesList');
+        const issuesStr = data.issues || 'None';
+        const issues = issuesStr.split(',').map(i => i.trim()).filter(i => i);
+        if (issues.length > 0) {
+            issues.forEach(issue => {
+                const li = document.createElement('li');
+                li.textContent = issue;
+                issuesList.appendChild(li);
+            });
+        } else {
+            const li = document.createElement('li');
+            li.textContent = 'None';
+            issuesList.appendChild(li);
+        }
 
-// Fill personal/contact info
-document.getElementById('contactId').textContent = data.contactId || '—';
-document.getElementById('submitted').textContent = data.verificationSubmitTimestamp || '—';
-document.getElementById('surname').textContent = data.lastName || '—';
-document.getElementById('givenNames').textContent = data.firstName || '—';
-document.getElementById('dob').textContent = data.dob || '—';
-document.getElementById('nationality').textContent = data.nationality || '—';
-document.getElementById('passportSurname').textContent = data.extracted?.surname || '—';
-document.getElementById('passportGivenNames').textContent = data.extracted?.givenNames || '—';
-document.getElementById('passportDob').textContent = data.extracted?.dob || '—';
-document.getElementById('passportNationality').textContent = data.extracted?.nationality || '—';
-document.getElementById('passportNumber').textContent = data.passportNumber || '—';
-document.getElementById('passportExpiry').textContent = data.passportExpiry || '—';
-document.getElementById('email').textContent = data.email || '—';
-document.getElementById('phone').textContent = data.phoneNumber || '—';
-document.getElementById('addressLine1').textContent = data.addressLine1 || '—';
-document.getElementById('cityZip').textContent = (data.addressCity || '') + ' ' + (data.addressZip || '');
-document.getElementById('addressCountry').textContent = data.addressCountry || '—';
+        const modal = document.getElementById('modal');
+        const modalImg = document.getElementById('modalImg');
+        [document.getElementById('passportImg'), document.getElementById('idImg')].forEach(img => {
+            img.onclick = () => {
+                modalImg.src = img.src;
+                modal.classList.add('active');
+            };
+        });
+        modal.onclick = () => modal.classList.remove('active');
 
-// Images with fallback
-const setImg = (id, url) => {
-    const img = document.getElementById(id);
-    img.src = url || '';
-    img.crossOrigin = "anonymous";
-    img.onerror = () => { img.src = 'https://via.placeholder.com/150?text=Image+not+found'; };
-};
-setImg('passportImg', data.passportUrl);
-setImg('idImg', data.idPhotoUrl);
-
-// Issues as single string
-const issuesList = document.getElementById('issuesList');
-const issueString = data.issues || 'None';
-const li = document.createElement('li');
-li.textContent = issueString;
-issuesList.appendChild(li);
-
-// Image modal
-const modal = document.getElementById('modal');
-const modalImg = document.getElementById('modalImg');
-[document.getElementById('passportImg'), document.getElementById('idImg')].forEach(img => {
-    img.onclick = () => {
-        modalImg.src = img.src;
-        modal.classList.add('active');
-    };
-});
-modal.onclick = () => modal.classList.remove('active');
-
-// Verification buttons
-const webhook = 'https://hook.eu2.make.com/451we04092bdhoa61zbof96ddgcwkwcy';
-document.getElementById('verify-btn').addEventListener('click', async () => {
-    if (!confirm('Mark as VERIFIED?')) return;
-    const payload = { contactId: data.contactId, verificationStatus: 'verified', comments: 'success', timestamp: new Date().toISOString() };
-    const res = await fetch(webhook, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
-    if (res.ok) {
-        alert('Verified!');
-        document.getElementById('verify-btn').disabled = true;
-        document.getElementById('verify-btn').textContent = 'VERIFIED';
-    } else alert('Error');
-});
-document.getElementById('fail-btn').addEventListener('click', async () => {
-    const comments = document.getElementById('comments').value.trim();
-    if (!comments) { alert('Please enter comments'); return; }
-    if (!confirm('Mark as FAILED?')) return;
-    const payload = { contactId: data.contactId, verificationStatus: 'FAILED', comments, timestamp: new Date().toISOString() };
-    const res = await fetch(webhook, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
-    if (res.ok) {
-        alert('Failure recorded');
-        document.getElementById('fail-btn').disabled = true;
-        document.getElementById('fail-btn').textContent = 'FAILED SENT';
-    } else alert('Error');
-});
-</script>
+        const webhook = 'https://hook.eu2.make.com/451we04092bdhoa61zbof96ddgcwkwcy';
+        document.getElementById('verify-btn').addEventListener('click', async () => {
+            if (!confirm('Mark as VERIFIED?')) return;
+            const payload = { contactId, verificationStatus: 'verified', comments: 'success', timestamp: new Date().toISOString() };
+            const res = await fetch(webhook, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
+            if (res.ok) {
+                alert('Verified!');
+                document.getElementById('verify-btn').disabled = true;
+                document.getElementById('verify-btn').textContent = 'VERIFIED';
+            } else alert('Error');
+        });
+        document.getElementById('fail-btn').addEventListener('click', async () => {
+            const comments = document.getElementById('comments').value.trim();
+            if (!comments) { alert('Please enter comments'); return; }
+            if (!confirm('Mark as FAILED?')) return;
+            const payload = { contactId, verificationStatus: 'FAILED', comments, timestamp: new Date().toISOString() };
+            const res = await fetch(webhook, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
+            if (res.ok) {
+                alert('Failure recorded');
+                document.getElementById('fail-btn').disabled = true;
+                document.getElementById('fail-btn').textContent = 'FAILED SENT';
+            } else alert('Error');
+        });
+    </script>
 </body>
 </html>
