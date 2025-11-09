@@ -128,19 +128,14 @@
         document.getElementById('cityZip').textContent = (data.addressCity || '') + ' ' + (data.addressZip || '');
         document.getElementById('addressCountry').textContent = data.addressCountry || '—';
 
+        // NEW: treat issues as single string
         const issuesList = document.getElementById('issuesList');
-        if (data.issues && data.issues.length > 0) {
-            data.issues.forEach(issue => {
-                const li = document.createElement('li');
-                li.textContent = issue;
-                issuesList.appendChild(li);
-            });
-        } else {
-            const li = document.createElement('li');
-            li.textContent = 'None';
-            issuesList.appendChild(li);
-        }
+        const issueString = data.issues || 'None';
+        const li = document.createElement('li');
+        li.textContent = issueString;
+        issuesList.appendChild(li);
 
+        // Image modal
         const modal = document.getElementById('modal');
         const modalImg = document.getElementById('modalImg');
         [document.getElementById('passportImg'), document.getElementById('idImg')].forEach(img => {
@@ -151,6 +146,7 @@
         });
         modal.onclick = () => modal.classList.remove('active');
 
+        // Buttons
         const webhook = 'https://hook.eu2.make.com/451we04092bdhoa61zbof96ddgcwkwcy';
         document.getElementById('verify-btn').addEventListener('click', async () => {
             if (!confirm('Mark as VERIFIED?')) return;
