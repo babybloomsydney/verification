@@ -99,16 +99,21 @@
     </div>
 
     <script>
+        // --- 1. DECODE URL PARAM (with URL decode) ---
         const params = new URLSearchParams(location.search);
         const encoded = params.get('data');
         let data = {};
         if (encoded) {
-            try { data = JSON.parse(atob(encoded)); }
-            catch(e) { alert('Invalid data'); }
+            try {
+                const decoded = decodeURIComponent(encoded);
+                data = JSON.parse(atob(decoded));
+            } catch (e) {
+                alert('Invalid data');
+            }
         }
 
-        const contactId = data.contactId || '—';
-        document.getElementById('contactId').textContent = contactId;
+        // --- 2. POPULATE FIELDS (flat JSON) ---
+        document.getElementById('contactId').textContent = data.contactId || '—';
         document.getElementById('submitted').textContent = data.verificationSubmitTimestamp || '—';
         document.getElementById('passportImg').src = data.passportUrl || '';
         document.getElementById('idImg').src = data.idPhotoUrl || '';
@@ -116,18 +121,19 @@
         document.getElementById('givenNames').textContent = data.firstName || '—';
         document.getElementById('dob').textContent = data.dob || '—';
         document.getElementById('nationality').textContent = data.nationality || '—';
-        document.getElementById('passportSurname').textContent = data.extracted?.surname || '—';
-        document.getElementById('passportGivenNames').textContent = data.extracted?.givenNames || '—';
-        document.getElementById('passportDob').textContent = data.extracted?.dob || '—';
-        document.getElementById('passportNationality').textContent = data.extracted?.nationality || '—';
+        document.getElementById('passportSurname').textContent = data.extractedSurname || '—';
+        document.getElementById('passportGivenNames').textContent = data.extractedGivenNames || '—';
+        document.getElementById('passportDob').textContent = data.extractedDob || '—';
+        document.getElementById('passportNationality').textContent = data.extractedNationality || '—';
         document.getElementById('passportNumber').textContent = data.passportNumber || '—';
-        document.getElementById('passportExpiry').textContent = data.passportExpiry || '—';
+        document.getElementById('passportExpiry').textContent = data.extractedPassportExpiry || '—';
         document.getElementById('email').textContent = data.email || '—';
         document.getElementById('phone').textContent = data.phoneNumber || '—';
         document.getElementById('addressLine1').textContent = data.addressLine1 || '—';
         document.getElementById('cityZip').textContent = (data.addressCity || '') + ' ' + (data.addressZip || '');
         document.getElementById('addressCountry').textContent = data.addressCountry || '—';
 
+        // --- 3. ISSUES (string) ---
         const issuesList = document.getElementById('issuesList');
         const issuesStr = data.issues || 'None';
         const issues = issuesStr.split(',').map(i => i.trim()).filter(i => i);
@@ -143,6 +149,7 @@
             issuesList.appendChild(li);
         }
 
+        // --- 4. MODAL ---
         const modal = document.getElementById('modal');
         const modalImg = document.getElementById('modalImg');
         [document.getElementById('passportImg'), document.getElementById('idImg')].forEach(img => {
@@ -153,10 +160,11 @@
         });
         modal.onclick = () => modal.classList.remove('active');
 
+        // --- 5. BUTTONS ---
         const webhook = 'https://hook.eu2.make.com/451we04092bdhoa61zbof96ddgcwkwcy';
         document.getElementById('verify-btn').addEventListener('click', async () => {
             if (!confirm('Mark as VERIFIED?')) return;
-            const payload = { contactId, verificationStatus: 'verified', comments: 'success', timestamp: new Date().toISOString() };
+            const payload = { contactId: data.contactId, verificationStatus: 'verified', comments: 'success', timestamp: new Date().toISOString() };
             const res = await fetch(webhook, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
             if (res.ok) {
                 alert('Verified!');
@@ -168,7 +176,7 @@
             const comments = document.getElementById('comments').value.trim();
             if (!comments) { alert('Please enter comments'); return; }
             if (!confirm('Mark as FAILED?')) return;
-            const payload = { contactId, verificationStatus: 'FAILED', comments, timestamp: new Date().toISOString() };
+            const payload = { contactId: data.contactId, verificationStatus: 'FAILED', comments, timestamp: new Date().toISOString() };
             const res = await fetch(webhook, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
             if (res.ok) {
                 alert('Failure recorded');
